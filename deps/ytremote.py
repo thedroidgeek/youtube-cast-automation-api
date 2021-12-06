@@ -12,6 +12,7 @@
 
 import json
 import uuid
+import time
 import string
 import random
 
@@ -110,6 +111,28 @@ class YouTubeRemote(object):
 
     def zx(self):
         return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(12))
+
+    def generatePairingcode(self):
+        return str(uuid.uuid4())
+
+    def checkPairingStatus(self, pairing_code):
+        response = WebRequest("https://www.youtube.com/api/lounge/pairing/get_screen").post(body = {'pairing_code' : pairing_code})
+        if response.status_code != 200:
+            return False
+        data = json.loads(response.content)["screen"]
+        print('screen = %s\n' % json.dumps(data, indent = 4))
+        self.screen_id = data["screenId"]
+        self.loungeToken = data["loungeToken"]
+        self.expiration = data["expiration"]
+        return True
+
+    def waitForPairing(self, pairing_code, timeout = 30):
+        timeout = time.time() + timeout
+        while time.time() < timeout:
+            if self.checkPairingStatus(pairing_code):
+                return True
+            time.sleep(2)
+        raise TimeoutError('Failed to pair with the TV')
 
     def loadLoungeToken(self, screen_ids):
         text_res = WebRequest("https://www.youtube.com/api/lounge/pairing/get_lounge_token_batch").post(body = {'screen_ids' : screen_ids}).content

@@ -75,13 +75,26 @@ def PlayYtQuery(query):
             # initialize the YouTube remote
             remote = YouTubeRemote(Config.get('RemoteDisplayName'))
 
-            # get the screen ID from the TV using the DIAL protocol
-            screenId = TvUtil.getYtScreenId()
-            print('=> Got YouTube screen ID from TV: %s\n' % screenId)
+            if Config.get('ReadYtTokenFromDial'):
+                # get the screen ID from the TV using the DIAL protocol
+                screenId = TvUtil.getYtScreenId()
+                print('=> Got YouTube screen ID from TV: %s\n' % screenId)
 
-            # request the YouTube lounge API token using the screen ID
-            loungeToken = remote.loadLoungeToken(screenId)
-            print('=> Got lounge API token: %s\n' % loungeToken)
+                # request the YouTube lounge API token using the screen ID
+                loungeToken = remote.loadLoungeToken(screenId)
+                print('=> Got lounge API token: %s\n' % loungeToken)
+
+            else:
+                # generate a random UUID for pairing
+                code = remote.generatePairingcode()
+                print('=> Generated a pairing code for the TV: %s\n' % code)
+
+                # send YouTube pairing request to TV
+                print('=> Sending a pairing request to the TV...\n')
+                TvUtil.pairYt(code)
+
+                # wait for pairing to succeed (or timeout)
+                remote.waitForPairing(code)
 
             # set playing queue from YouTube search results
             print('=> Setting playing queue on TV...\n')

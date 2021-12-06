@@ -38,6 +38,8 @@ class Config:
             Config.set('RemoteDisplayName', '🌈 Google Assistant')
         if Config.get('TvLanHost') == None:
             Config.set('TvLanHost', 'tizen')
+        if Config.get('ReadYtTokenFromDial') == None:
+            Config.set('ReadYtTokenFromDial', False)
 
     cfg_write_mtx = threading.Lock()
     # persists the current config to storage
@@ -95,6 +97,17 @@ class WebRequest:
             return None
 
 class TvUtil:
+
+    @staticmethod
+    def pairYt(pairingCode):
+        tvDialYouTubeEndpoint = 'http://%s:8080/ws/app/YouTube' % Config.get('TvLanHost')
+        ytStatus = WebRequest(tvDialYouTubeEndpoint).post(body = {"pairingCode" : pairingCode, "theme" : "cl"}, timeout = 35)
+        if ytStatus != None:
+            if ytStatus.status_code == 401:
+                raise PermissionError("The YouTube pairing request was denied by the TV")
+            if ytStatus.status_code == 201 or ytStatus.status_code == 200:
+                return True
+            raise Exception("Got an unexpected response from the TV")
 
     @staticmethod
     def getYtScreenId():
