@@ -126,7 +126,7 @@ class YouTubeRemote(object):
         self.expiration = data["expiration"]
         return True
 
-    def waitForPairing(self, pairing_code, timeout = 30):
+    def waitForPairing(self, pairing_code, timeout = 15):
         timeout = time.time() + timeout
         while time.time() < timeout:
             if self.checkPairingStatus(pairing_code):

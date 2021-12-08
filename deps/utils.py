@@ -101,18 +101,25 @@ class TvUtil:
     @staticmethod
     def pairYt(pairingCode):
         tvDialYouTubeEndpoint = 'http://%s:8080/ws/app/YouTube' % Config.get('TvLanHost')
-        ytStatus = WebRequest(tvDialYouTubeEndpoint).post(body = {"pairingCode" : pairingCode, "theme" : "cl"}, timeout = 35)
-        if ytStatus != None:
-            if ytStatus.status_code == 401:
-                raise PermissionError("The YouTube pairing request was denied by the TV")
-            if ytStatus.status_code == 201 or ytStatus.status_code == 200:
-                return True
-            raise Exception("Got an unexpected response from the TV")
+        timeout = time.time() + 40
+        tvRequest = WebRequest(tvDialYouTubeEndpoint)
+        while time.time() < timeout:
+            response = tvRequest.get(timeout = 3)
+            if response != None and response.status_code == 200: # check if TV is reachable
+                ytStatus = tvRequest.post(body = {"pairingCode" : pairingCode, "theme" : "cl"}, timeout = 30)
+                if ytStatus != None:
+                    if ytStatus.status_code == 401:
+                        raise PermissionError("The YouTube pairing request was denied by the TV")
+                    if ytStatus.status_code == 201 or ytStatus.status_code == 200:
+                        return True
+                raise Exception("Got an unexpected response from the TV")
+            time.sleep(0.5)
+        raise TimeoutError('Failed to send pairing request to the TV')
 
     @staticmethod
     def getYtScreenId():
         tvDialYouTubeEndpoint = 'http://%s:8080/ws/app/YouTube' % Config.get('TvLanHost')
-        timeout = time.time() + 30
+        timeout = time.time() + 40
         tvRequest = WebRequest(tvDialYouTubeEndpoint)
         while time.time() < timeout:
             ytStatus = tvRequest.get(timeout = 3)
@@ -127,7 +134,7 @@ class TvUtil:
     @staticmethod
     def getYtLoungeToken():
         tvDialYouTubeEndpoint = 'http://%s:8080/ws/app/YouTube' % Config.get('TvLanHost')
-        timeout = time.time() + 30
+        timeout = time.time() + 40
         tvRequest = WebRequest(tvDialYouTubeEndpoint)
         while time.time() < timeout:
             ytStatus = tvRequest.get(timeout = 3)
