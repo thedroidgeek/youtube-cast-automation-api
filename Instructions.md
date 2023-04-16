@@ -1,4 +1,6 @@
-## IFTTT + Google Assistant Instructions
+## IFTTT + Google Assistant Instructions (DEPRECATED)
+
+#### UPDATE: As of August 31, 2022, this integration is no longer possible due to [Google's changes](https://ifttt.com/explore/google-assistant-changes) (variable input on commands is no longer supported).
 
 0. Make sure you have Python 3
 1. `git clone https://github.com/thedroidgeek/youtube-cast-automation-api`

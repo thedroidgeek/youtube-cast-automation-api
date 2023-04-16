@@ -4,7 +4,7 @@ A small API made to cast YouTube videos on a target TV that's on the same networ
 
 The main goal is to provide the possibility of automation, by integrating the API on IFTTT, and Google Assistant for voice commands.
 
-For instructions on how to integrate this with IFTTT/Google Assistant, see [here](Instructions.md).
+~~For instructions on how to integrate this with IFTTT/Google Assistant, see [here](Instructions.md).~~
 
 For the complete API documentation, see [here](API-docs.md).
 
